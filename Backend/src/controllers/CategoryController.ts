@@ -97,7 +97,7 @@ export class CategoryController {
 
     try {
       const category = await this.repository.findOne({
-        where: { id, isActive: true }
+        where: { id }
       });
 
       if (!category) {
@@ -106,8 +106,7 @@ export class CategoryController {
         });
       }
 
-      category.isActive = false;
-      await this.repository.save(category);
+      await this.repository.remove(category);
 
       return response.status(204).send();
     } catch (error) {

@@ -140,7 +140,7 @@ export class UserController {
 
     try {
       const user = await this.repository.findOne({
-        where: { id: userId, isActive: true }
+        where: { id: userId }
       });
 
       if (!user) {
@@ -149,8 +149,7 @@ export class UserController {
         });
       }
 
-      user.isActive = false;
-      await this.repository.save(user);
+      await this.repository.remove(user);
 
       return response.status(204).send();
     } catch (error) {

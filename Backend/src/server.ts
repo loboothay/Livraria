@@ -4,25 +4,9 @@ import cors from 'cors';
 import 'express-async-errors';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './swagger';
-import { DataSource } from 'typeorm';
-
-// Create a new DataSource instance
-export const AppDataSource = new DataSource({
-    type: "postgres", // or your database type
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "5432"),
-    username: process.env.DB_USERNAME || "dba",
-    password: process.env.DB_PASSWORD || "dba",
-    database: process.env.DB_DATABASE || "livrariaDb",
-    synchronize: true,
-    logging: false,
-    entities: ["src/entities/*.ts"],
-    migrations: ["src/migrations/*.ts"],
-    subscribers: ["src/subscribers/*.ts"],
-});
+import { AppDataSource } from './data-source';
 import { errorHandler } from './middleware/errorHandler';
 import { routes } from './routes';
-
 
 const app = express();
 
