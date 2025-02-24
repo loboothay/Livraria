@@ -16,6 +16,26 @@ services:
       - livraria_net
     restart: always
 
+  backend:
+    container_name: livraria-backend
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Expondo a API na porta 3000
+    environment:
+      - PORT=3000
+      - DB_HOST=livraria-postgres
+      - DB_PORT=5432
+      - DB_USER=dba
+      - DB_PASS=dba
+      - DB_NAME=livrariaDb
+    depends_on:
+      - livraria-postgres
+    networks:
+      - livraria_net
+    restart: always
+
   pgadmin:
     container_name: livraria-pgadmin
     image: dpage/pgadmin4
