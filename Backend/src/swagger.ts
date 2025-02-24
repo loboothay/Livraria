@@ -25,6 +25,74 @@ export const swaggerDocument: SwaggerOptions = {
       }
     },
     schemas: {
+      Loan: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            format: 'uuid'
+          },
+          user: {
+            $ref: '#/components/schemas/UserProfile'
+          },
+          book: {
+            $ref: '#/components/schemas/Book'
+          },
+          loanDate: {
+            type: 'string',
+            format: 'date-time'
+          },
+          expectedReturnDate: {
+            type: 'string',
+            format: 'date-time'
+          },
+          actualReturnDate: {
+            type: 'string',
+            format: 'date-time',
+            nullable: true
+          },
+          isReturned: {
+            type: 'boolean',
+            default: false
+          },
+          isOverdue: {
+            type: 'boolean',
+            default: false
+          },
+          reminderSent: {
+            type: 'boolean',
+            default: false
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time'
+          },
+          updatedAt: {
+            type: 'string',
+            format: 'date-time'
+          },
+          isActive: {
+            type: 'boolean',
+            default: true
+          }
+        }
+      },
+      LoanCreate: {
+        type: 'object',
+        properties: {
+          bookId: {
+            type: 'string',
+            format: 'uuid',
+            example: '123e4567-e89b-12d3-a456-426614174000'
+          },
+          expectedReturnDate: {
+            type: 'string',
+            format: 'date-time',
+            example: '2024-02-01T00:00:00.000Z'
+          }
+        },
+        required: ['bookId', 'expectedReturnDate']
+      },
       Book: {
         type: 'object',
         properties: {
@@ -360,6 +428,69 @@ export const swaggerDocument: SwaggerOptions = {
     }
   },
   paths: {
+    '/loans': {
+      post: {
+        tags: ['Empréstimos'],
+        summary: 'Criar novo empréstimo',
+        description: 'Cria um novo empréstimo de livro',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/LoanCreate'
+              }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Empréstimo criado com sucesso',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Loan'
+                }
+              }
+            }
+          },
+          '400': {
+            description: 'Dados inválidos'
+          },
+          '401': {
+            description: 'Não autorizado - Token inválido ou expirado'
+          },
+          '404': {
+            description: 'Livro não encontrado'
+          }
+        }
+      },
+      get: {
+        tags: ['Empréstimos'],
+        summary: 'Listar empréstimos',
+        description: 'Retorna a lista de todos os empréstimos ativos',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          '200': {
+            description: 'Lista de empréstimos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/Loan'
+                  }
+                }
+              }
+            }
+          },
+          '401': {
+            description: 'Não autorizado - Token inválido ou expirado'
+          }
+        }
+      }
+    },
     '/reviews': {
       post: {
         tags: ['Avaliações'],
@@ -1153,6 +1284,84 @@ export const swaggerDocument: SwaggerOptions = {
           },
           '404': {
             description: 'Categoria não encontrada'
+          }
+        }
+      }
+    },
+
+    '/loans/{id}': {
+      get: {
+        tags: ['Empréstimos'],
+        summary: 'Obter empréstimo por ID',
+        description: 'Retorna os detalhes de um empréstimo específico',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID do empréstimo',
+            schema: {
+              type: 'string',
+              format: 'uuid'
+            }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Detalhes do empréstimo',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Loan'
+                }
+              }
+            }
+          },
+          '401': {
+            description: 'Não autorizado - Token inválido ou expirado'
+          },
+          '404': {
+            description: 'Empréstimo não encontrado'
+          }
+        }
+      },
+      patch: {
+        tags: ['Empréstimos'],
+        summary: 'Devolver livro',
+        description: 'Registra a devolução de um livro emprestado',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID do empréstimo',
+            schema: {
+              type: 'string',
+              format: 'uuid'
+            }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Livro devolvido com sucesso',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Loan'
+                }
+              }
+            }
+          },
+          '401': {
+            description: 'Não autorizado - Token inválido ou expirado'
+          },
+          '404': {
+            description: 'Empréstimo não encontrado'
+          },
+          '400': {
+            description: 'Livro já devolvido ou operação inválida'
           }
         }
       }

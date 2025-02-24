@@ -3,6 +3,7 @@ import { UserController } from './controllers/UserController';
 import { BookController } from './controllers/BookController';
 import { CategoryController } from './controllers/CategoryController';
 import { ReviewController } from './controllers/ReviewController';
+import { LoanController } from './controllers/LoanController';
 import { authMiddleware } from './middleware/authMiddleware';
 
 const routes = Router();
@@ -10,6 +11,7 @@ const userController = new UserController();
 const bookController = new BookController();
 const categoryController = new CategoryController();
 const reviewController = new ReviewController();
+const loanController = new LoanController();
 
 // Rota de teste para verificar se a API está funcionando
 routes.get('/health', (_, res) => {
@@ -45,5 +47,11 @@ routes.get('/reviews', reviewController.list.bind(reviewController));
 routes.get('/reviews/user', authMiddleware, reviewController.getUserReviews.bind(reviewController));
 routes.put('/reviews/:id', authMiddleware, reviewController.update.bind(reviewController));
 routes.delete('/reviews/:id', authMiddleware, reviewController.delete.bind(reviewController));
+
+// Rotas de empréstimos
+routes.post('/loans', authMiddleware, loanController.create.bind(loanController));
+routes.get('/loans', authMiddleware, loanController.list.bind(loanController));
+routes.get('/loans/:id', authMiddleware, loanController.getOne.bind(loanController));
+routes.patch('/loans/:id', authMiddleware, loanController.return.bind(loanController));
 
 export { routes };
